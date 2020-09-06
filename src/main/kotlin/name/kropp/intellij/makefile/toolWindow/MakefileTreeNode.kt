@@ -8,4 +8,8 @@ abstract class MakefileTreeNode(val name: String) : TreeNode {
   object Comparator : kotlin.Comparator<MakefileTreeNode> {
     override fun compare(a: MakefileTreeNode, b: MakefileTreeNode): Int = a.name.compareTo(b.name, ignoreCase = true)
   }
+
+  open fun renderTo(cellRenderer: MakefileCellRenderer) {
+    cellRenderer.append(name)
+  }
 }

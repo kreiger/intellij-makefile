@@ -1,5 +1,6 @@
 package name.kropp.intellij.makefile.toolWindow
 
+import com.intellij.openapi.module.ModuleUtil
 import com.intellij.openapi.project.*
 import name.kropp.intellij.makefile.*
 import javax.swing.tree.*
@@ -20,20 +21,29 @@ class MakefileToolWindowOptions(val project: Project) {
     set(value) { settings?.settings?.sortAlphabeticallyInToolWindow = value }
 
   fun getRootNode(): TreeNode {
-    val files = MakefileTargetIndex.allTargets(project).filterNot { (it.isSpecialTarget && !showSpecialTargets) || it.isPatternTarget }.groupBy {
-      it.containingFile
-    }.map {
-      val targets = if (sortAlphabetically) {
-        it.value.map(::MakefileTargetNode).sortedWith(MakefileTreeNode.Comparator)
-      } else {
-        it.value.map(::MakefileTargetNode)
-      }
-      MakefileFileNode(it.key, targets)
-    }.let {
-      if (sortAlphabetically) {
-        it.sortedWith(MakefileTreeNode.Comparator)
-      } else it
-    }
-    return MakefileRootNode(files)
+      val files = MakefileTargetIndex.allTargets(project)
+              .filterNot { (it.isSpecialTarget && !showSpecialTargets) || it.isPatternTarget }
+              .groupBy { it.containingFile }
+              .map {
+                  val targets = if (sortAlphabetically) {
+                      it.value.map(::MakefileTargetNode).sortedWith(MakefileTreeNode.Comparator)
+                  } else {
+                      it.value.map(::MakefileTargetNode)
+                  }
+                  MakefileFileNode(it.key, targets)
+              }
+              .let {
+                  it.sortedWith(compareBy<MakefileFileNode> { it.dir }.thenBy { it.name })
+              }
+      val modules = files
+              .groupBy { ModuleUtil.findModuleForFile(it.psiFile) }
+              .map {
+                  MakefileModuleNode(it.key, it.value)
+              }
+              .let {
+                  it.sortedBy { it.module?.name }
+              }
+
+      return MakefileRootNode(modules)
   }
 }

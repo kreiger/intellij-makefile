@@ -1,5 +1,7 @@
 package name.kropp.intellij.makefile.toolWindow
 
+import com.intellij.ui.SimpleTextAttributes.REGULAR_ATTRIBUTES
+import com.intellij.ui.SimpleTextAttributes.REGULAR_ITALIC_ATTRIBUTES
 import name.kropp.intellij.makefile.*
 import name.kropp.intellij.makefile.psi.*
 import java.util.*
@@ -25,4 +27,12 @@ class MakefileTargetNode(val target: MakefileTarget) : MakefileTreeNode(target.n
   override fun getIndex(node: TreeNode) = 0
 
   override fun getAllowsChildren() = false
+
+  override fun renderTo(cellRenderer: MakefileCellRenderer) {
+    cellRenderer.append(name, when {
+        target.isSpecialTarget -> REGULAR_ITALIC_ATTRIBUTES
+        else -> REGULAR_ATTRIBUTES
+    })
+  }
+
 }

@@ -6,27 +6,27 @@ import java.util.Collections.*
 import javax.swing.*
 import javax.swing.tree.*
 
-class MakefileRootNode(private val files: List<MakefileFileNode>) : MakefileTreeNode("make") {
+class MakefileRootNode(private val modules: List<MakefileModuleNode>) : MakefileTreeNode("make") {
   init {
-    for (file in files) {
-      file.parent = this
+    for (module in modules) {
+      module.parent = this
     }
   }
 
   override val icon: Icon
     get() = MakefileIcon
 
-  override fun children(): Enumeration<MakefileFileNode> = enumeration(files)
+  override fun children(): Enumeration<MakefileModuleNode> = enumeration(modules)
 
   override fun isLeaf() = false
 
-  override fun getChildCount() = files.size
+  override fun getChildCount() = modules.size
 
   override fun getParent() = null
 
-  override fun getChildAt(i: Int) = files[i]
+  override fun getChildAt(i: Int) = modules[i]
 
-  override fun getIndex(node: TreeNode) = files.indexOf(node)
+  override fun getIndex(node: TreeNode) = modules.indexOf(node)
 
   override fun getAllowsChildren() = true
 }
